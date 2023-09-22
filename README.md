@@ -7,7 +7,7 @@ Collect tools, look for clues, and solve riddles in order to Escape your ultimat
 - C: create new player/user
 - R: show inventory, hints in the room, and tools they can pick up
 - U: update the foreign key of the tool item so that it matches the owner
-- D: delete an item from our inventory by it's name 
+- D: delete an item from our inventory by it's id 
 
 
 # Object Relationships:
@@ -19,6 +19,7 @@ Collect tools, look for clues, and solve riddles in order to Escape your ultimat
 
 - player names: of type str and less than 15 characters
 - tools: tools have to be of type Tool (instance)
+  - tools name attribute should not be able to change
 
 
 # User story map
