@@ -4,10 +4,18 @@
 
 Collect tools, look for clues, and solve riddles in order to Escape your ultimate demise. (advanced deliverable: timed game)
 
-- C: create new player/user
-- R: show inventory, hints in the room, and tools they can pick up
+Tools/Inventory
+
+- C: Create tool when a new item gets picked up
+- R: Show inventory of exisiting tool and new tool that you can choose to swap a slot for
 - U: update the foreign key of the tool item so that it matches the owner
-- D: delete an item from our inventory by it's id 
+- D: delete an item from our inventory by it's id
+
+Player/User
+
+- C: Create new player/user
+- R: Show welcome {player} name after user inputs their name
+- D: Delete your player/user after they finish the game ("Do you want to delete yourself? GAME OVER")
 
 
 # Object Relationships:
