@@ -59,18 +59,7 @@ def find_player_by_name():
 def storyline():
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "light_cyan", attrs=["bold"])
     time.sleep(3.0)
-    cprint("   ___________               ________________________________________________", "light_cyan", attrs=["bold"])
-    cprint(" _|   _____   |_          .-- You're guilty of stealing other people's code! --.", "light_cyan", attrs=["bold"])
-    cprint(" |    \ * /    |         ( The only way to redeem yourself is by solving all the )", "light_cyan", attrs=["bold"])
-    cprint(" |    (___)    |        (   riddles on the wall. In doing so, you'll earn a key  ) ", "light_cyan", attrs=["bold"])
-    cprint("\_______________/       (                 that can set you free!!              _)", "light_cyan", attrs=["bold"])
-    cprint(" (    \    /    )       | ,---------------------------------------------------'", "light_cyan", attrs=["bold"])
-    cprint(" /    O    O    \       |/", "light_cyan", attrs=["bold"])
-    cprint("/____    ^   ____\ ", "light_cyan", attrs=["bold"])
-    cprint(" |      ~       |", "light_cyan", attrs=["bold"])
-    cprint("  \_ _ _  _ _ _/", "light_cyan", attrs=["bold"])
-    cprint("  ..__|    |__.. ", "light_cyan", attrs=["bold"])
-    cprint(" /          *   \ ", "light_cyan", attrs=["bold"])
+
 
 
 def options_choice():
