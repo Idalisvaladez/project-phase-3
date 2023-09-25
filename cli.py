@@ -7,10 +7,10 @@ import time
 
 from helpers import (
     welcome,
-    wall_one,
     storyline,
     create_player,
-    find_player_by_name
+    find_player_by_name,
+    options_choice,
 )
 
 def main():
@@ -28,19 +28,13 @@ def start():
     choice = input("[y/ N] >  ")
     if choice == 'y':
         storyline()
+        time.sleep(3.5)
+        options_choice()
     elif choice == 'N':
         figlet = Figlet(font='ogre', width= 100)
         cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])
 
 
-def first_wall():
-    time.sleep(0.5)
-    wall_one()
-    choice = input("> ")
-    if choice == "B":
-        cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-    else:
-        cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
 
 
 if __name__ == "__main__":
