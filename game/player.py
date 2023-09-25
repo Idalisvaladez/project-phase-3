@@ -2,7 +2,7 @@ from game.__init__ import CONN, CURSOR
 
 class Player:
     # dict to store all player instances to a database
-    all = {}
+    all = []
 
     def __init__(self, name, id=None):
         self.name = name
@@ -38,6 +38,13 @@ class Player:
         CONN.commit()
     
     @classmethod
+    def fetch_table(cls):
+        SQLfetch = CURSOR.execute("SELECT * FROM players").fetchall()
+        for player in SQLfetch:
+            cls.create_nonDB(player[1],player[0]-1)
+        CONN.commit()
+
+    @classmethod
     def drop_table(cls):
         """Drop the persisted Player object"""
         sql = """
@@ -45,6 +52,17 @@ class Player:
         """
         CURSOR.execute(sql)
         CONN.commit()
+
+    def save_nonDB(self):
+        type(self).all.append(self)
+
+    @classmethod
+    def create_nonDB(cls, name, id):
+        """Initialize a new player and save to database"""
+        player = cls(name,id)
+        player.save_nonDB()
+        return player
+
 
     def save(self):
         """Player row added with name of current instance created"""
@@ -55,8 +73,8 @@ class Player:
         CURSOR.execute(sql, (self.name,))
         CONN.commit()
 
-        self.id = CURSOR.lastrowid
-        type(self).all[self.id] = self
+        self.id = CURSOR.lastrowid-1
+        type(self).all.append(self)
 
     
     @classmethod
@@ -92,3 +110,10 @@ class Player:
         return cls.db_instance(row) if row else None
        
 
+    @classmethod
+    def remove_player_by_id(cls,id):
+        """Removes the player from the database based on the ID"""
+        CURSOR.execute("DELETE FROM players WHERE id=?",(id+1,))
+        CONN.commit()
+
+        cls.all.pop(id)
