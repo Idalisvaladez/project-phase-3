@@ -51,9 +51,12 @@ def wall_one():
 def create_player():
     Player.create_table()
     name = input("Enter the player's name: ")
+    print(type(name))
     try:
         player = Player.create(name)
-        print(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
+        cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
+        with open("player.db", 'a') as file:
+            file.write(name)
     except Exception as exc:
         print("Error creating player: ", exc)
 
