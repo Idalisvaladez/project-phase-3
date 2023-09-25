@@ -8,6 +8,11 @@ class Player:
         self.name = name
         self.id = id
 
+    def __repr__(self):
+        return (
+            f'<Player {self.id} : {self.name}>'
+        )
+
     @property
     def name(self):
         return self._name
@@ -47,7 +52,7 @@ class Player:
             INSERT INTO players (name)
             VALUES (?);
         """
-        CURSOR.execute(sql, (self.name))
+        CURSOR.execute(sql, (self.name,))
         CONN.commit()
 
         self.id = CURSOR.lastrowid
@@ -85,15 +90,5 @@ class Player:
 
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.db_instance(row) if row else None
-        # for player in self.players:
-        #     if player.name == player_name:
-        #         return player
-        # return None
+       
 
-    def show_inventory(self, name):
-        """Show the inventory of a player."""
-        player = self.find_player(name)
-        if player:
-            player.show_inventory()
-        else:
-            print(f"Player '{name}' not found.")
