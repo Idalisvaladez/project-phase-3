@@ -59,7 +59,25 @@ def find_player_by_name():
 def storyline():
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "light_cyan", attrs=["bold"])
     time.sleep(3.0)
-
+    cprint("           ________________                        ________________________________________________", 'light_cyan')
+    cprint("           \      __      /         __         .-- You're guilty of stealing other people's code! --.", 'light_cyan')
+    cprint("            \_____()_____/         /  )       ( The only way to redeem yourself is by solving all the )", 'light_cyan')
+    cprint("            '============`        /  /       (   riddles on the wall. In doing so, you'll earn a key  )", 'light_cyan')
+    cprint("            #---\  /---#         /  /        (                 that can set you free!!              _)", 'light_cyan')
+    cprint("            (# @\| |/@ #)       /  /         | ,---------------------------------------------------'", 'light_cyan')
+    cprint("             \   (_)   /       /  /          |/", 'light_cyan')
+    cprint("             |\ '---` /|      /  /", 'light_cyan')
+    cprint("     _______/  \_____/  \____/ o_|", 'light_cyan')
+    cprint("    /       \  /     \  /   / o_|", 'light_cyan')
+    cprint("   / |           o|        / o_| \ ", 'light_cyan')
+    cprint("  /  |  _____     |       / /   \ \ ", 'light_cyan')
+    cprint(" /   |  |===|    o|      / /\    \ \ ", 'light_cyan')
+    cprint("|    |   \@/      |     / /  \    \ \ ", 'light_cyan')
+    cprint("|    |___________o|__/----)   \    \/ ", 'light_cyan')
+    cprint("|    '              ||  --)    \     |", 'light_cyan')
+    cprint("|___________________||  --)     \    /", 'light_cyan')
+    cprint("     |           o|   ''''   |   \__/", 'light_cyan')
+    cprint("     |            |          |", 'light_cyan')
 
 
 def options_choice():
