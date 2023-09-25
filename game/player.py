@@ -1,28 +1,99 @@
+from game.__init__ import CONN, CURSOR
+
 class Player:
-    def __init__(self, name):
+    # dict to store all player instances to a database
+    all = {}
+
+    def __init__(self, name, id=None):
         self.name = name
-        self.inventory = []
+        self.id = id
 
-    def __str__(self):
-        return f"Player: {self.name}"
-
-    def add_item_to_inventory(self, item):
-        """Add an item to the player's inventory."""
-        self.inventory.append(item)
-
-    def remove_item_from_inventory(self, item_name):
-        """Remove an item from the player's inventory by name."""
-        for item in self.inventory:
-            if item.name == item_name:
-                self.inventory.remove(item)
-                return True
-        return False
-
-    def show_inventory(self):
-        """Display the player's inventory."""
-        if not self.inventory:
-            print(f"{self.name}'s inventory is empty.")
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, name):
+        if isinstance(name, str) and len(name) < 15:
+            self._name = name
         else:
-            print(f"{self.name}'s inventory:")
-            for item in self.inventory:
-                print(f"- {item}")
+            raise ValueError(
+                "Player name must be a non-empty string"
+            )
+    
+    @classmethod
+    def create_table(cls):
+        """Create a new table to persist Player attributes"""
+        sql = """
+            CREATE TABLE IF NOT EXISTS players (
+            id INTEGER PRIMARY KEY,
+            name TEXT)
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+    
+    @classmethod
+    def drop_table(cls):
+        """Drop the persisted Player object"""
+        sql = """
+            DROP TABLE IF EXISTS players;
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    def save(self):
+        """Player row added with name of current instance created"""
+        sql = """
+            INSERT INTO players (name)
+            VALUES (?);
+        """
+        CURSOR.execute(sql, (self.name))
+        CONN.commit()
+
+        self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
+
+    
+    @classmethod
+    def create(cls, name):
+        """Initialize a new player and save to database"""
+        player = cls(name)
+        player.save()
+        return player
+    
+
+    @classmethod
+    def db_instance(cls, row):
+        """Return player with matching attribute value from the table"""
+        player = cls.all.get(row[0])
+        if player:
+            player.name = row[1]
+        else:
+            player = cls(row[1])
+            player.id = row[0]
+            cls.all[player.id] = player
+        return player
+
+    @classmethod
+    def find_player(cls, name):
+        """Find a player by name."""
+        sql = """
+            SELECT *
+            FROM players
+            WHERE name is ?
+        """
+
+        row = CURSOR.execute(sql, (name,)).fetchone()
+        return cls.db_instance(row) if row else None
+        # for player in self.players:
+        #     if player.name == player_name:
+        #         return player
+        # return None
+
+    def show_inventory(self, name):
+        """Show the inventory of a player."""
+        player = self.find_player(name)
+        if player:
+            player.show_inventory()
+        else:
+            print(f"Player '{name}' not found.")
