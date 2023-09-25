@@ -14,14 +14,36 @@ def welcome():
 
 def create_player():
     Player.create_table()
-    name = input("Enter the player's name: ")
-    try:
+    Player.fetch_table()
+    print(Player.all)
+    if len(Player.all) != 4:
+        name = input("Enter the new player's name: ")
         player = Player.create(name)
         cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
         with open("player.db", 'a') as file:
             file.write(name)
-    except Exception as exc:
-        print("Error creating player: ", exc)
+    else:
+        cprint("Already at max players, please select one to replace by inputing the corresponding number", "red")
+        for play in Player.all:
+            print(f"{play.id + 1} - {play.name}")
+        replaced = input(">")
+        try:
+            replaced = int(replaced)
+        except Exception as exc:
+            print("Error selecting player, likely not ID number: ", exc)
+        print(replaced)
+        if isinstance(replaced,int) and 0 < replaced:
+            Player.remove_player_by_id(Player.all[replaced - 1].id)
+            name = input("Enter the new player's name: ")
+            try:
+                player = Player.create(name)
+                cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
+                with open("player.db", 'a') as file:
+                    file.write(name)
+            except Exception as exc:
+                print("Error creating player: ", exc)
+        else:
+            print("Invalid ID number")
 
 
 

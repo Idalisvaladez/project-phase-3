@@ -15,22 +15,22 @@ from helpers import (
 
 def main():
     cprint("New player?")
-    choice = input("[y/ N] >  ")
+    choice = input("[Y/N] >  ").lower()
     if choice == "y":
         create_player()
-    elif choice == "N":
+    elif choice == "n":
         find_player_by_name()
 
 
 
 def start():
     cprint("Ready?")
-    choice = input("[y/ N] >  ")
+    choice = input("[Y/N] >  ").lower()
     if choice == 'y':
         storyline()
         time.sleep(3.5)
         options_choice()
-    elif choice == 'N':
+    elif choice == 'n':
         figlet = Figlet(font='ogre', width= 100)
         cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])
 
