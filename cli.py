@@ -3,6 +3,7 @@ from game.player import Player
 from game.inventory import Inventory 
 from pyfiglet import Figlet
 from termcolor import cprint
+import inquirer
 import time
 
 from helpers import (
@@ -11,29 +12,46 @@ from helpers import (
     create_player,
     find_player_by_name,
     options_choice,
+    option_one
 )
 
 def main():
-    cprint("New player?")
-    choice = input("[Y/N] >  ").lower()
-    if choice == "y":
+    print("New player?")
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['Yes', 'No'],
+                      default='Yes')
+    ]
+    answers = inquirer.prompt(questions)
+    choice = answers['choice'].lower()
+    
+    if choice == 'yes':
         create_player()
-    elif choice == "n":
+    elif choice == 'no':
         find_player_by_name()
 
 
 
 def start():
-    cprint("Ready?")
-    choice = input("[Y/N] >  ").lower()
-    if choice == 'y':
+    print("Ready?")
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['Yes', 'No'],
+                      default='Yes')
+    ]
+    answers = inquirer.prompt(questions)
+    choice = answers['choice'].lower()
+
+    if choice == 'yes':
         storyline()
         time.sleep(3.5)
         options_choice()
-    elif choice == 'n':
-        figlet = Figlet(font='ogre', width= 100)
+        option_one()
+    elif choice == 'no':
+        figlet = Figlet(font='ogre', width=100)
         cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])
-
 
 
 
