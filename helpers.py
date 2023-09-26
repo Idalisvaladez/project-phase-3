@@ -1,5 +1,6 @@
 from termcolor import cprint
 from pyfiglet import Figlet
+import inquirer
 import time
 from game.player import Player
 
@@ -82,37 +83,61 @@ def storyline():
 
 def options_choice():
     time.sleep(3.0)
-    cprint("As you take a moment to collect yourself you come up with three possible options")
-    cprint("You can either: ")
+    cprint("As you take a moment to collect yourself you come up with three possible options", attrs=["bold"])
+    cprint("You can either: ", attrs=["bold"])
     time.sleep(2.0)
-    cprint("1. Take a look around your jail cell.")
-    cprint("2. Check your pockets for any tools that could help you escape.")
-    cprint("3. Scream, cry, and beg for forgiveness.")
-    option = input("What will it be? ")
-    if option == 1:
+
+    options = [
+        inquirer.List('option',
+                      message="What will it be?",
+                      choices=['Take a look around your jail cell', 'Check your pockets for any tools that could help you escape', 'Scream, cry, and beg for forgiveness'])
+    ]
+
+    answers = inquirer.prompt(options)
+    chosen_option = answers['option']
+
+    if chosen_option == 'Take a look around your jail cell':
         option_one()
-    elif option == 2:
+    elif chosen_option == 'Check your pockets for any tools that could help you escape':
+        # Implement logic for this option here
         pass
-    elif option == 3:
+    elif chosen_option == 'Scream, cry, and beg for forgiveness':
+        # Implement logic for this option here
         pass
     else:
         print("Not an answer choice")
 
 def option_one():
-    cprint("You get up to get a better look at your surroundings. You notice each wall has a different riddle.")
-    cprint("Standing in the middle your eyes dart back and forth to each wall.")
-    cprint("Instead of wasting anymore time you decide to just go for it and pick a wall to try.")
+    cprint("You get up to get a better look at your surroundings. You notice each wall has a different riddle.", attrs=["bold"])
+    cprint("Standing in the middle your eyes dart back and forth to each wall.", attrs=["bold"])
+    cprint("Instead of wasting anymore time you decide to just go for it and pick a wall to try.", attrs=["bold"])
     time.sleep(3.5)
-    cprint("Try wall: 1")
-    cprint("Try wall: 2")
-    cprint("Try wall: 3")
-    wall = input("Which wall will it be? ")
-    if wall == 1:
+
+    wall_choices = [
+        inquirer.List('wall',
+                      message="Which wall will it be?",
+                      choices=['Wall 1', 'Wall 2', 'Wall 3'])
+    ]
+
+    answers = inquirer.prompt(wall_choices)
+    chosen_wall = answers['wall']
+
+    if chosen_wall == 'Wall 1':
         wall_one()
-    elif wall == 2:
+    elif chosen_wall == 'Wall 2':
+        # Implement logic for Wall 2 here
         pass
-    elif wall == 3:
+    elif chosen_wall == 'Wall 3':
+        # Implement logic for Wall 3 here
         pass
+
+def wall_one():
+    # Implement the wall_one function here
+    pass
+
+if __name__ == "__main__":
+    option_one()
+
 
 
 def first_wall():
