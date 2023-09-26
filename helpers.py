@@ -32,9 +32,13 @@ def create_player():
             replaced = int(replaced)
         except Exception as exc:
             print("Error selecting player, likely not ID number: ", exc)
-        print(replaced)
+        playerIdHold = None
+        for play in Player.all:
+            if play.id == replaced-1:
+                playerHold = play
+
         if isinstance(replaced,int) and 0 < replaced:
-            Player.remove_player_by_id(Player.all[replaced - 1].id)
+            Player.remove_player(playerHold)
             name = input("Enter the new player's name: ")
             try:
                 player = Player.create(name)

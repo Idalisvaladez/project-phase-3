@@ -111,9 +111,9 @@ class Player:
        
 
     @classmethod
-    def remove_player_by_id(cls,id):
+    def remove_player(cls,player):
         """Removes the player from the database based on the ID"""
-        CURSOR.execute("DELETE FROM players WHERE id=?",(id+1,))
+        CURSOR.execute("DELETE FROM players WHERE id=?",(player.id+1,))
         CONN.commit()
 
-        cls.all.pop(id)
+        cls.all.pop(cls.all.index(player))
