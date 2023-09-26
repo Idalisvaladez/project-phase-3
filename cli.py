@@ -46,7 +46,7 @@ def start():
 
     if choice == 'yes':
         storyline()
-        time.sleep(3.5)
+        time.sleep(.5)
         options_choice()
         option_one()
     elif choice == 'no':

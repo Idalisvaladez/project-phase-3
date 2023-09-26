@@ -127,7 +127,7 @@ def option_one():
     chosen_wall = answers['wall']
 
     if chosen_wall == 'Wall 1':
-        wall_one()
+        first_wall()
     elif chosen_wall == 'Wall 2':
         # Implement logic for Wall 2 here
         pass
@@ -135,22 +135,25 @@ def option_one():
         # Implement logic for Wall 3 here
         pass
 
-def wall_one():
-    # Implement the wall_one function here
-    pass
-
-if __name__ == "__main__":
-    option_one()
-
 
 
 def first_wall():
     wall_one()
-    choice = input("> ")
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+                      default='A')
+    ]
+    answers = inquirer.prompt(questions)
+    choice = answers['choice']
+
     if choice == "B":
         cprint("CORRECT!", "white", "on_green", attrs=['bold'])
     else:
         cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
+        first_wall()
+
 
 def wall_one():
     cprint("After a day of sunbathing in the garden, Sofia needs to go to sleep.", 'white', attrs=["bold"])
