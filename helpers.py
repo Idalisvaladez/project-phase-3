@@ -4,6 +4,7 @@ import inquirer
 import time
 from game.player import Player
 from game.inventory import Inventory
+import itertools
 
 
 
@@ -53,6 +54,7 @@ def create_player():
 # Logic for if new player answer is No, that way they can choose an existing player out of
 # the list of records in our Player table
 def find_existing_player():
+    Inventory.fetch_table()
     Player.fetch_table()
     player_choices = [
         inquirer.List('player',
@@ -173,17 +175,56 @@ def first_wall():
 
     if choice == "B":
         cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-    else:
-        cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
+        cprint("                _______________________________________________",)
+        cprint("            _-'    .-.-____________________________________.-.-- `-_ ",)
+        cprint("          _-'.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-..--\  .-.-.`-_",)
+        cprint("       _-'.-.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.`__\. .-.-.-.`-_",)
+        cprint("    _-'.-.-.-.-. .-----.-.-.-.-.-[______]-.-.-.-.-.-.-.----. .-.-.-.-.`-_",)
+        cprint(" _-'.-.-.-.-.-. .|_________________________________________|. .---.-.-.-.`-_",)
+        cprint(":-----------------------------------------------------------------------------:",)
+        cprint("`---._.-----------------------------------------------------------------._.---'",)
+        wall_one_invent()
         first_wall()
 
+def wall_one_invent():
+    cprint("A secret hatch opens on the wall and reveals a keyboard! Do you take it?", 'white', attrs=["bold"])
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['Yes', 'No'],
+                      default='Yes')
+    ]
+    answers = inquirer.prompt(questions)
+    choice = answers['choice']
+    
+    if choice == "Yes":
+        cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'white', attrs=["bold"])
 
+    # Create a list of item choices with IDs from Inventory.all
+    item_choices = [(tool.name, tool.id) for tool in Inventory.all]
 
+    inventory_choices = [
+        inquirer.List('item',
+                      message="Select an item to replace:",
+                      choices=[item[0] for item in item_choices]
+        )
+    ]
+    item_answers = inquirer.prompt(inventory_choices)
 
+    # Get the selected item's name
+    selected_item_name = item_answers['item']
 
+    # Find the item by name
+    items = [tool for tool in Inventory.all if tool.name == selected_item_name]
+    
+    if items:
+        # Use itertools.islice to get the item after the found item
+        item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
 
-
-
-
-
-
+        if item_after:
+            item_after.update_invent("keyboard")  # Set the name to "keyboard"
+            cprint(f"You have replaced {selected_item_name} with the keyboard.", 'green', attrs=["bold"])
+        else:
+            cprint("No item found after the selected item.", 'red', attrs=["bold"])
+    else:
+        cprint("Item not found in inventory.", 'red', attrs=["bold"])

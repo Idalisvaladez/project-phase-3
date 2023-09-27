@@ -9,6 +9,9 @@ class Inventory:
         self.player_id = player_id
         Inventory.all.append(self)
 
+    def __repr__(self):
+        return f'{self.name}'
+    
     @property
     def name(self):
         return self._name
@@ -29,6 +32,23 @@ class Inventory:
         """
         CURSOR.execute(sql)
         CONN.commit()
+        
+    @classmethod
+    def fetch_table(cls):
+        SQLfetch = CURSOR.execute("SELECT * FROM inventory").fetchall()
+        for tool in SQLfetch:
+            cls.create_nonDB(tool[1],tool[0]-1, tool[2])
+        CONN.commit()
+        
+    @classmethod
+    def create_nonDB(cls, name, id, player_id):
+        """Initialize a new player and save to database"""
+        tool = cls(name, player_id, id )
+        tool.save_nonDB()
+        return tool
+    
+    def save_nonDB(self):
+        type(self).all.append(self)
 
     @classmethod
     def drop_table(cls):
@@ -58,6 +78,15 @@ class Inventory:
         """
 
         CURSOR.execute(sql, (self.player_id, self.id))
+        CONN.commit()
+        
+    def update_invent(self, replacement_name):
+        sql = """
+            UPDATE inventory
+            SET name = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (replacement_name, self.id))
         CONN.commit()
 
     @classmethod
@@ -107,11 +136,32 @@ class Inventory:
         sql = """
             SELECT *
             FROM inventory
-            WHERE name is ?
+            WHERE name = ?
         """
 
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.in_db(row) if row else None
+
+    
+    @classmethod
+    def find_by_id(cls, item_id):
+        sql = """
+            SELECT *
+            FROM inventory
+            WHERE id = ?
+        """
+
+        row = CURSOR.execute(sql, (item_id,)).fetchone()
+        return cls.in_db(row) if row else None
+    
+
+    @classmethod
+    def fetch_inventory (self):
+        sql = """
+            SELECT * FROM inventory
+            WHERE player_id = ?
+        """
+        CURSOR.execute(sql, (self.player_id))
 
     # @property
     # def tools(self):
