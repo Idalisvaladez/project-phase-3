@@ -135,7 +135,7 @@ def option_one():
         # Implement logic for Wall 3 here
         pass
 
-
+print("trial run")
 
 def first_wall():
     wall_one()
