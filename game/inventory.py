@@ -1,45 +1,139 @@
-import sqlite3
-
-CONN = sqlite3.connect('player.db')
-CURSOR = CONN.cursor()
+from game.__init__ import CONN, CURSOR
 
 class Inventory:
     all = []
 
-    def __init__(self, player_id):
+    def __init__(self, name, player_id, id=None):
+        self.name = name
+        self.id = id
         self.player_id = player_id
         Inventory.all.append(self)
 
     @property
-    def tools(self):
-        sql = """
-            SELECT tools.name
-            FROM inventory
-            JOIN tools ON inventory.tool_id = tools.id
-            WHERE inventory.player_id = ?
-        """
-        CURSOR.execute(sql, (self.player_id,))
-        return [row[0] for row in CURSOR.fetchall()]
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, name):
+        if isinstance(name, str):
+            self._name = name
 
-    def add_tool(self, tool_name):
+    @classmethod
+    def create_table(cls):
         sql = """
-            INSERT INTO inventory (player_id, tool_id)
-            VALUES (?, (SELECT id FROM tools WHERE name = ?));
+            CREATE TABLE IF NOT EXISTS inventory (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            player_id INTEGER,
+            FOREIGN KEY (player_id) REFERENCES players(id))
         """
-        try:
-            CURSOR.execute(sql, (self.player_id, tool_name))
-            CONN.commit()
-            return True
-        except sqlite3.IntegrityError:
-            return False
+        CURSOR.execute(sql)
+        CONN.commit()
 
-    def remove_tool(self, tool_name):
+    @classmethod
+    def drop_table(cls):
+        sql = """
+            DROP TABLE IF EXISTS inventory;
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    def save(self):
+        sql = """
+            INSERT INTO inventory (name, player_id)
+            VALUES (?, ?)
+        """
+
+        CURSOR.execute(sql, (self.name, self.player_id))
+        CONN.commit()
+
+        self.id = CURSOR.lastrowid-1
+        type(self).all[self.id] = self
+    
+    def update(self):
+        sql = """
+            UPDATE inventory
+            SET player_id = ?
+            WHERE id = ?
+        """
+
+        CURSOR.execute(sql, (self.player_id, self.id))
+        CONN.commit()
+
+    @classmethod
+    def delete(cls, inventory):
         sql = """
             DELETE FROM inventory
-            WHERE player_id = ? AND tool_id = (SELECT id FROM tools WHERE name = ?);
+            WHERE id = ?
         """
-        CURSOR.execute(sql, (self.player_id, tool_name))
+        CURSOR.execute(sql, (inventory.id,))
         CONN.commit()
+
+        cls.all.pop(cls.all.index(inventory))
+
+
+
+    @classmethod
+    def create(cls, name, player_id):
+        tool = cls(name, player_id)
+        tool.save()
+        return tool
+    
+    @classmethod
+    def in_db(cls, row):
+        tool = cls.all.index(row[0])
+        if tool:
+            tool.name = row[1]
+            tool.player_id = row[2]
+        else:
+            tool = cls(row[1], row[2])
+            tool.id = row[0]
+            cls.all[tool.id] = tool
+        return tool
+    
+    @classmethod
+    def tools(cls):
+        sql = """
+            SELECT *
+            FROM players
+            JOIN inventory 
+            ON players.id = inventory.player_id;
+        """
+        CURSOR.execute(sql)
+        return [row[0] for row in CURSOR.fetchall()]
+    
+    @classmethod
+    def find_by_name(cls, name):
+        sql = """
+            SELECT *
+            FROM inventory
+            WHERE name is ?
+        """
+
+        row = CURSOR.execute(sql, (name,)).fetchone()
+        return cls.in_db(row) if row else None
+
+
+
+    # def add_tool(self, tool_name):
+    #     sql = """
+    #         INSERT INTO inventory (player_id, tool_id)
+    #         VALUES (?, (SELECT id FROM tools WHERE name = ?));
+    #     """
+    #     try:
+    #         CURSOR.execute(sql, (self.player_id, tool_name))
+    #         CONN.commit()
+    #         return True
+    #     except sqlite3.IntegrityError:
+    #         return False
+
+    # def remove_tool(self, tool_name):
+    #     sql = """
+    #         DELETE FROM inventory
+    #         WHERE player_id = ? AND tool_id = (SELECT id FROM tools WHERE name = ?);
+    #     """
+    #     CURSOR.execute(sql, (self.player_id, tool_name))
+    #     CONN.commit()
 
 
     #def add_item_to_inventory(self, item):

@@ -10,9 +10,8 @@ from helpers import (
     welcome,
     storyline,
     create_player,
-    find_player_by_name,
+    find_existing_player,
     options_choice,
-    option_one
 )
 
 def main():
@@ -29,7 +28,7 @@ def main():
     if choice == 'yes':
         create_player()
     elif choice == 'no':
-        find_player_by_name()
+        find_existing_player()
 
 
 
@@ -48,7 +47,6 @@ def start():
         storyline()
         time.sleep(3.5)
         options_choice()
-        option_one()
     elif choice == 'no':
         figlet = Figlet(font='ogre', width=100)
         cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])

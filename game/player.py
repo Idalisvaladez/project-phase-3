@@ -73,7 +73,7 @@ class Player:
         CURSOR.execute(sql, (self.name,))
         CONN.commit()
 
-        self.id = CURSOR.lastrowid-1
+        self.id = CURSOR.lastrowid
         type(self).all.append(self)
 
     
@@ -84,11 +84,20 @@ class Player:
         player.save()
         return player
     
+    @classmethod
+    def all_players(cls):
+        sql = """
+            SELECT *
+            FROM players
+        """
+
+        rows = CURSOR.execute(sql).fetchall()
+        return [cls.db_instance(row) for row in rows]
 
     @classmethod
     def db_instance(cls, row):
         """Return player with matching attribute value from the table"""
-        player = cls.all.get(row[0])
+        player = cls.all.index(row[0])
         if player:
             player.name = row[1]
         else:
@@ -98,15 +107,14 @@ class Player:
         return player
 
     @classmethod
-    def find_player(cls, name):
-        """Find a player by name."""
+    def find_by_id(cls, id):
         sql = """
             SELECT *
             FROM players
-            WHERE name is ?
+            WHERE id = ?
         """
 
-        row = CURSOR.execute(sql, (name,)).fetchone()
+        row = CURSOR.execute(sql, (id,)).fetchone()
         return cls.db_instance(row) if row else None
        
 

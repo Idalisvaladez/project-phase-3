@@ -3,26 +3,38 @@ from pyfiglet import Figlet
 import inquirer
 import time
 from game.player import Player
+from game.inventory import Inventory
 
 
-
-
+#Logic for opening game logo
 def welcome():
     figlet = Figlet(font='isometric2', width= 200)
     cprint(figlet.renderText('The Escapist!'), 'green')
     time.sleep(1.0)
 
-
+#Logic for if new player answer is Yes, prompted to create a player
 def create_player():
     Player.create_table()
-    Player.fetch_table()
     print(Player.all)
+    Player.fetch_table()
     if len(Player.all) != 4:
         name = input("Enter the new player's name: ")
         player = Player.create(name)
-        cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
+        cprint(f"{player} successfully created.", 'green' , attrs=['bold'])
         with open("player.db", 'a') as file:
             file.write(name)
+        #After new player is created an inventory table connecting that players id to the tool is 
+        #established and adding 4 starter items
+        Inventory.drop_table()
+        Inventory.create_table()
+
+        Inventory.create("Bobby pin", player.id)
+        Inventory.create("UN-sharpened pencil", player.id)
+        Inventory.create("Loose change", player.id)
+        Inventory.create("Chewed-up bubble gum", player.id)
+
+    #Logic to take account for if there are already 4 slots taken up
+    #Selects a player by id to delete and replace with a new input from the user
     else:
         cprint("Already at max players, please select one to replace by inputing the corresponding number", "red")
         for play in Player.all:
@@ -37,30 +49,54 @@ def create_player():
             if play.id == replaced-1:
                 playerHold = play
 
+        #if the input value is an int and greater than 0 it removes that player who's id
+        #matches the input and allows the user to create a new player
         if isinstance(replaced,int) and 0 < replaced:
             Player.remove_player(playerHold)
             name = input("Enter the new player's name: ")
             try:
                 player = Player.create(name)
-                cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
+                cprint(f"{player} successfully created.", 'green' , attrs=['bold'])
                 with open("player.db", 'a') as file:
                     file.write(name)
             except Exception as exc:
                 print("Error creating player: ", exc)
+            Inventory.drop_table()
+            Inventory.create_table()
+
+            Inventory.create("Bobby pin", player.id)
+            Inventory.create("UN-sharpened pencil", player.id)
+            Inventory.create("Loose change", player.id)
+            Inventory.create("Chewed-up bubble gum", player.id)
+        #takes into account if the user submits an invalid id
         else:
             print("Invalid ID number")
 
 
+# Logic for if new player answer is No, that way they can choose an existing player out of
+# the list of records in our Player table
+def find_existing_player():
+    Player.fetch_table()
+    player_choices = [
+        inquirer.List('player',
+                      message="Choose an existing player",
+                      choices=[player for player in Player.all],
+                    ),
+    ]
+    answers = inquirer.prompt(player_choices)
+    chosen_player = answers['player']
+    player = chosen_player
+    if isinstance(player, Player):
+        cprint(f'Welcome back {player}', "green")
+        
+    else:
+        cprint("Error selecting player", "red")
 
-def find_player_by_name():
-    name = input("Enter player's name: ")
-    player = Player.find_player(name)
-    print(player) if player else print(
-        f'Player {name} not found'
-    )
+#Need to create update player_id for inventory function. For when an existing player is selected
+#It's id gets assigned as the inventorys player_id as well
 
 
-
+#Logic for beginning storline if user selects Yes to being ready
 def storyline():
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "light_cyan", attrs=["bold"])
     time.sleep(3.0)
@@ -84,7 +120,7 @@ def storyline():
     cprint("     |           o|   ''''   |   \__/", 'light_cyan')
     cprint("     |            |          |", 'light_cyan')
 
-
+#propmts users the their first 3 choices for the storyline
 def options_choice():
     time.sleep(3.0)
     cprint("As you take a moment to collect yourself you come up with three possible options", attrs=["bold"])
@@ -111,6 +147,7 @@ def options_choice():
     else:
         print("Not an answer choice")
 
+#Logic for if the player chose the first option to look around the cell
 def option_one():
     cprint("You get up to get a better look at your surroundings. You notice each wall has a different riddle.", attrs=["bold"])
     cprint("Standing in the middle your eyes dart back and forth to each wall.", attrs=["bold"])
@@ -127,7 +164,7 @@ def option_one():
     chosen_wall = answers['wall']
 
     if chosen_wall == 'Wall 1':
-        wall_one()
+        first_wall()
     elif chosen_wall == 'Wall 2':
         # Implement logic for Wall 2 here
         pass
@@ -135,24 +172,8 @@ def option_one():
         # Implement logic for Wall 3 here
         pass
 
-def wall_one():
-    # Implement the wall_one function here
-    pass
-
-if __name__ == "__main__":
-    option_one()
-
-
 
 def first_wall():
-    wall_one()
-    choice = input("> ")
-    if choice == "B":
-        cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-    else:
-        cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
-
-def wall_one():
     cprint("After a day of sunbathing in the garden, Sofia needs to go to sleep.", 'white', attrs=["bold"])
     cprint("She walks through all the doors once and closes them behind her.", 'white', attrs=["bold"])
     cprint("Which room is her bedroom?", 'white', attrs=["bold"])
@@ -167,6 +188,20 @@ def wall_one():
     cprint("              |   B  |            |         |___  \__|", 'white')
     cprint("              |      |             /       \      H  |", 'white')
     cprint("              |_  \____/__________|_________|________|", 'white')
+    room_choices = [
+        inquirer.List('room',
+                      message="Which wall will it be?",
+                      choices=['A','B','C','D','E','F','G','H'])
+    ]
+
+    answers = inquirer.prompt(room_choices)
+    answer = answers['room'].lower()
+    if answer == "b":
+        cprint("CORRECT!", "white", "on_green", attrs=['bold'])
+    else:
+        cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
+
+
 
 
 
