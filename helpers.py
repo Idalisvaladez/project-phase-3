@@ -3,6 +3,7 @@ from pyfiglet import Figlet
 import inquirer
 import time
 from game.player import Player
+from game.inventory import Inventory
 
 
 
@@ -23,6 +24,15 @@ def create_player():
         cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
         with open("player.db", 'a') as file:
             file.write(name)
+        #After new player is created an inventory table connecting that players id to the tool is 
+        #established and adding 4 starter items
+        Inventory.drop_table()
+        Inventory.create_table()
+
+        Inventory.create("Bobby pin", player.id)
+        Inventory.create("UN-sharpened pencil", player.id)
+        Inventory.create("Loose change", player.id)
+        Inventory.create("Chewed-up bubble gum", player.id)
     else:
         cprint("Already at max players, please select one to replace by inputing the corresponding number", "red")
         for play in Player.all:
@@ -47,17 +57,36 @@ def create_player():
                     file.write(name)
             except Exception as exc:
                 print("Error creating player: ", exc)
+            Inventory.drop_table()
+            Inventory.create_table()
+
+            Inventory.create("Bobby pin", player.id)
+            Inventory.create("UN-sharpened pencil", player.id)
+            Inventory.create("Loose change", player.id)
+            Inventory.create("Chewed-up bubble gum", player.id)
         else:
             print("Invalid ID number")
 
 
 
-def find_player_by_name():
-    name = input("Enter player's name: ")
-    player = Player.find_player(name)
-    print(player) if player else print(
-        f'Player {name} not found'
-    )
+# Logic for if new player answer is No, that way they can choose an existing player out of
+# the list of records in our Player table
+def find_existing_player():
+    Player.fetch_table()
+    player_choices = [
+        inquirer.List('player',
+                      message="Choose an existing player",
+                      choices=[player for player in Player.all],
+                    ),
+    ]
+    answers = inquirer.prompt(player_choices)
+    chosen_player = answers['player']
+    player = chosen_player
+    if isinstance(player, Player):
+        cprint(f'Welcome back {player}', "green")
+        
+    else:
+        cprint("Error selecting player", "red")
 
 
 
@@ -135,10 +164,23 @@ def option_one():
         # Implement logic for Wall 3 here
         pass
 
-print("trial run")
+
 
 def first_wall():
-    wall_one()
+    cprint("After a day of sunbathing in the garden, Sofia needs to go to sleep.", 'white', attrs=["bold"])
+    cprint("She walks through all the doors once and closes them behind her.", 'white', attrs=["bold"])
+    cprint("Which room is her bedroom?", 'white', attrs=["bold"])
+    cprint("              ____   _________   _____________   _____", 'white')
+    cprint("              |   \  |        \   |         | \   F  |", 'white')
+    cprint("              |      |            |    D    |__    __|", 'white')
+    cprint("               /  A  |            |         |   \    |", 'white')
+    cprint("              |       /           |        \         |", 'white')
+    cprint("              |__  \_|            |__    \__|    G   |", 'white')
+    cprint("              |      |      C     |         |        |", 'white')
+    cprint("              |      |            |     E    \       |", 'white')
+    cprint("              |   B  |            |         |___  \__|", 'white')
+    cprint("              |      |             /       \      H  |", 'white')
+    cprint("              |_  \____/__________|_________|________|", 'white')
     questions = [
         inquirer.List('choice',
                       message="Choose an option:",
@@ -155,21 +197,7 @@ def first_wall():
         first_wall()
 
 
-def wall_one():
-    cprint("After a day of sunbathing in the garden, Sofia needs to go to sleep.", 'white', attrs=["bold"])
-    cprint("She walks through all the doors once and closes them behind her.", 'white', attrs=["bold"])
-    cprint("Which room is her bedroom?", 'white', attrs=["bold"])
-    cprint("              ____   _________   _____________   _____", 'white')
-    cprint("              |   \  |        \   |         | \   F  |", 'white')
-    cprint("              |      |            |    D    |__    __|", 'white')
-    cprint("               /  A  |            |         |   \    |", 'white')
-    cprint("              |       /           |        \         |", 'white')
-    cprint("              |__  \_|            |__    \__|    G   |", 'white')
-    cprint("              |      |      C     |         |        |", 'white')
-    cprint("              |      |            |     E    \       |", 'white')
-    cprint("              |   B  |            |         |___  \__|", 'white')
-    cprint("              |      |             /       \      H  |", 'white')
-    cprint("              |_  \____/__________|_________|________|", 'white')
+
 
 
 
