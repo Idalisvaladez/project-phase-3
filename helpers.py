@@ -17,15 +17,27 @@ def welcome():
 def create_player():
     Player.create_table()
     Player.fetch_table()
-    print(Player.all)
-    if len(Player.all) != 4:
-        name = input("Enter the new player's name: ")
+    if len(Player.all) == 4:
+        cprint("Already at max players, please select a prior one to replace", "red")
+        questions = [
+            inquirer.List('choice',
+                message="Choose an option:",
+                choices=[play.name for play in Player.all]
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        choice = answers['choice']
+        playerHold = None
+        for play in Player.all:
+            if play.name == choice:
+                playerHold = play
+        Player.remove_player(playerHold)
+    name = input("Enter the new player's name: ")
+    try:
         player = Player.create(name)
         cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
         with open("player.db", 'a') as file:
             file.write(name)
-        #After new player is created an inventory table connecting that players id to the tool is 
-        #established and adding 4 starter items
         Inventory.drop_table()
         Inventory.create_table()
 
@@ -33,39 +45,8 @@ def create_player():
         Inventory.create("UN-sharpened pencil", player.id)
         Inventory.create("Loose change", player.id)
         Inventory.create("Chewed-up bubble gum", player.id)
-    else:
-        cprint("Already at max players, please select one to replace by inputing the corresponding number", "red")
-        for play in Player.all:
-            print(f"{play.id + 1} - {play.name}")
-        replaced = input(">")
-        try:
-            replaced = int(replaced)
-        except Exception as exc:
-            print("Error selecting player, likely not ID number: ", exc)
-        playerIdHold = None
-        for play in Player.all:
-            if play.id == replaced-1:
-                playerHold = play
-
-        if isinstance(replaced,int) and 0 < replaced:
-            Player.remove_player(playerHold)
-            name = input("Enter the new player's name: ")
-            try:
-                player = Player.create(name)
-                cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
-                with open("player.db", 'a') as file:
-                    file.write(name)
-            except Exception as exc:
-                print("Error creating player: ", exc)
-            Inventory.drop_table()
-            Inventory.create_table()
-
-            Inventory.create("Bobby pin", player.id)
-            Inventory.create("UN-sharpened pencil", player.id)
-            Inventory.create("Loose change", player.id)
-            Inventory.create("Chewed-up bubble gum", player.id)
-        else:
-            print("Invalid ID number")
+    except Exception as exc:
+        print("Error creating player: ", exc)
 
 
 
