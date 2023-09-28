@@ -294,7 +294,7 @@ def first_wall():
 def wall_one_invent():
     cprint("CORRECT!", "white", "on_green", attrs=['bold'])
     cprint("                _______________________________________________",)
-    cprint("            _-'    .-.-____________________________________.-.-- `-_ ",)
+    cprint("            _-' .-.-____________________________________.-.-- `-_ ",)
     cprint("          _-'.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-..--\  .-.-.`-_",)
     cprint("       _-'.-.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.`__\. .-.-.-.`-_",)
     cprint("    _-'.-.-.-.-. .-----.-.-.-.-.-[______]-.-.-.-.-.-.-.----. .-.-.-.-.`-_",)
@@ -356,17 +356,17 @@ def second_wall():
     cprint("              |      |_____/ \_____|____________________|", 'white')
     cprint("              |      |             |                    |", 'white')
     cprint("              |      |             |                    |", 'white')
-    cprint("              |      |_____/ \_____|                    |", 'white')
-    cprint("              |      |      B      |  *free the horsey* |", 'white')
-    cprint("              |       _____________|____________________|  ", 'white')
-    cprint("              |      |                                  | ",'white')
+    cprint("              |      | _____/ \____|                    |", 'white')
+    cprint("              |      |      B      |                    |", 'white')
+    cprint("              |       _____________|____________________|", 'white')
+    cprint("              |      |                                  |",'white')
     cprint("              |      |< What Is The Meaning Of Life...?>|", 'white')
-    cprint("              |      |     ---------------              | ", 'white')
+    cprint("              |      |     ---------------              |", 'white')
     cprint("              |     /| \   ^__^                         |", 'white')
     cprint("              |     ||  \  (oo)\__________......        |", 'white')
     cprint("              |     \|     (__)\       )\/)             |", 'white')
     cprint("              |      |          ||      ||              |", 'white')
-    cprint("______________|______|__________||______||______________|   ", 'white')
+    cprint("______________|______|__________||______||______________|", 'white')
      
     questions = [
         inquirer.List('choice',
@@ -387,7 +387,89 @@ def second_wall():
 
 
 def third_wall():
-    pass
+    cprint("You use the charger the power up the screen on this wall. The screen lights up and displays a message..", 'white', attrs=["bold"])
+    cprint("Another interesting riddle description...", 'white', attrs=["bold"])    
+    ascii_art = r'''
+
+                 _______________________________________________________
+                |                                                       |
+                |                                                       |
+                |                                                       |
+                |                                                       |
+                |                           3                           |
+                |                                                       |
+                |                                                       |
+                |                w k h f d n h l v d o l h              |
+                |                                                       |
+                |                           <                           |
+                |                                                       |
+                |                                                       |
+                |                                                       |
+                |                     Enter answer                      |
+                |                                                       |
+                |                                                       |
+                |                                                       |
+                |_______________________________________________________|
+                '''
+                
+    cprint(ascii_art, 'white')
+    
+
+    while True:
+        questions = [
+            inquirer.Text('answer', message="Enter the secret phrase:")
+        ]
+
+        answers = inquirer.prompt(questions)
+
+        user_input = answers['answer']
+
+        if user_input == "the cake is a lie":
+            cprint("You solved it!", 'green', attrs=["bold"])
+            cprint("The screen now shows an image resembling a key, and as you watch, it materializes before your eyes, gently descending into your open palm.", 'white', attrs=["bold"])
+            key_art()
+            cprint("This key looks like it fits the cell door..", 'white')
+            key_clue()
+            break
+        else:
+            cprint("Wrong answer. Try again.", 'red')
+            
+def key_art():
+    ascii_art = r'''
+                .--.
+               /.-. '----------.
+               \'-' .--"--""-"-'
+                '--'
+    '''
+
+    cprint(ascii_art, 'white')
+    
+            
+def key_clue():
+    cprint("You decide to take the key. Now, let's choose an item to replace:", 'white', attrs=["bold"])
+
+    # Create a list of item choices with IDs from Inventory.all
+    inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
+
+    inventory_choices = [
+        inquirer.List('item',
+                      message="Select an item to replace",
+                      choices=set([item.name for item in inventory])
+                      )
+    ]
+    item_answers = inquirer.prompt(inventory_choices)
+
+    # Get the selected item's name
+    selected_item_name = item_answers['item']
+
+    # Find the item by name
+    items = [tool for tool in inventory if tool.name == selected_item_name and tool.player_id == current_player]
+    items[0].update_invent("key")  # Set the name to "keyboard"
+    cprint(f"You have replaced {selected_item_name} with a key!", 'green', attrs=["bold"])
+    option_three()
+
+
+     
 
 def game_win():
     pass
