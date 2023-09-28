@@ -7,6 +7,7 @@ from game.inventory import Inventory
 import itertools
 
 
+current_player = 0
 
 
 def welcome():
@@ -15,14 +16,16 @@ def welcome():
     time.sleep(1.0)
 
 
+
 def create_player():
     Player.create_table()
+    Inventory.create_table()
     Player.fetch_table()
     if len(Player.all) == 4:
         cprint("Already at max players, please select a prior one to replace", "red")
         questions = [
             inquirer.List('choice',
-                message="Choose an option:",
+                message="Choose an option",
                 choices=[play.name for play in Player.all]
             )
         ]
@@ -33,47 +36,72 @@ def create_player():
             if play.name == choice:
                 playerHold = play
         Player.remove_player(playerHold)
-    name = input("Enter the new player's name: ")
+    
     try:
+        name = input("Enter the new player's name: ")
         player = Player.create(name)
-        cprint(f"Player '{player}' successfully created.", 'green' , attrs=['bold'])
-        with open("player.db", 'a') as file:
-            file.write(name)
-        Inventory.drop_table()
-        Inventory.create_table()
-
-        Inventory.create("Bobby pin", player.id)
-        Inventory.create("UN-sharpened pencil", player.id)
-        Inventory.create("Loose change", player.id)
+        global current_player
+        current_player = player.id
+        print(current_player)
+        cprint(f"Player '{player}' successfully created.", 'green', attrs=['bold'])
+        # Fetch the existing items associated with the previous player (if any)
+        existing_items = Inventory.fetch_table()
+        
+        Inventory.create("Bobby pin", player.id),
+        Inventory.create("UN-sharpened pencil", player.id),
+        Inventory.create("Loose change", player.id),
         Inventory.create("Chewed-up bubble gum", player.id)
+        # Commit the changes to the database
+
     except Exception as exc:
         print("Error creating player: ", exc)
+
 
 
 
 # Logic for if new player answer is No, that way they can choose an existing player out of
 # the list of records in our Player table
 def find_existing_player():
-    Inventory.fetch_table()
     Player.fetch_table()
     player_choices = [
         inquirer.List('player',
                       message="Choose an existing player",
                       choices=[player for player in Player.all],
                     ),
-    ]
+    ]    
     answers = inquirer.prompt(player_choices)
     chosen_player = answers['player']
     player = chosen_player
     if isinstance(player, Player):
         cprint(f'Welcome back {player}', "green")
-        
     else:
         cprint("Error selecting player", "red")
+    global current_player 
+    current_player = player.id
+    print(current_player)
+    start()
+
+def start():
+    print(f"Ready? {current_player}")
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['Yes', 'No'],
+                      default='Yes')
+    ]
+    answers = inquirer.prompt(questions)
+    choice = answers['choice'].lower()
+
+    if choice == 'yes':
+        storyline()
+    elif choice == 'no':
+        figlet = Figlet(font='ogre', width=100)
+        cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])
 
 
 
 def storyline():
+    print(current_player)
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "light_cyan", attrs=["bold"])
     time.sleep(3.0)
     cprint("           ________________                        ________________________________________________", 'light_cyan')
@@ -95,9 +123,12 @@ def storyline():
     cprint("|___________________||  --)     \    /", 'light_cyan')
     cprint("     |           o|   ''''   |   \__/", 'light_cyan')
     cprint("     |            |          |", 'light_cyan')
+    time.sleep(.5)
+    options_choice()
 
 
 def options_choice():
+    print(current_player)
     time.sleep(3.0)
     cprint("As you take a moment to collect yourself you come up with three possible options", attrs=["bold"])
     cprint("You can either: ", attrs=["bold"])
@@ -124,6 +155,9 @@ def options_choice():
         print("Not an answer choice")
 
 def option_one():
+    print(current_player)
+    Inventory.fetch_table()
+    inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("You get up to get a better look at your surroundings. You notice each wall has a different riddle.", attrs=["bold"])
     cprint("Standing in the middle your eyes dart back and forth to each wall.", attrs=["bold"])
     cprint("Instead of wasting anymore time you decide to just go for it and pick a wall to try.", attrs=["bold"])
@@ -141,13 +175,13 @@ def option_one():
     if chosen_wall == 'Wall 1':
         first_wall()
     elif chosen_wall == 'Wall 2':
-        if "keyboard" in Inventory.all:
+        if "keyboard" in inventory:
             second_wall()
         else:
             cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
             option_one()
     elif chosen_wall == 'Wall 3':
-        if "charger" in Inventory.all:
+        if "charger" in inventory:
             third_wall()
         else:
             cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
@@ -155,6 +189,8 @@ def option_one():
             
             
 def option_two():
+    Inventory.fetch_table()
+    inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("Looking around again, you see the walls before you.", attrs=["bold"])
     time.sleep(3.5)
 
@@ -169,18 +205,18 @@ def option_two():
     if chosen_wall == 'Wall 1':
         first_wall_complete()
     elif chosen_wall == 'Wall 2':
-        if "keyboard" in Inventory.all and "charger" in Inventory.all:
+        if "keyboard" in inventory and "charger" in inventory:
             cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
             option_two()
         else:
             second_wall()
     elif chosen_wall == 'Wall 3':
-        if "charger" not in Inventory.all:
+        if "charger" not in inventory:
             cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
             option_two()
-        elif "keyboard" in Inventory.all and "charger" in Inventory.all and "key" not in Inventory.all:
+        elif "keyboard" in inventory and "charger" in inventory and "key" not in inventory:
             third_wall()
-        elif "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+        elif "keyboard" in inventory and "charger" in inventory and "key" in inventory:
             cprint("You have already completed this wall. Time to leave!!", 'green', attrs=["bold"])
             option_three()
     elif chosen_wall == 'Ask the guard to let you out.':
@@ -191,6 +227,8 @@ def option_two():
             
     
 def option_three():
+    Inventory.fetch_table()
+    inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("Looking around again, you see the walls before you.", attrs=["bold"])
     time.sleep(3.5)
 
@@ -206,30 +244,29 @@ def option_three():
     if chosen_wall == 'Wall 1':
         first_wall_complete()
     elif chosen_wall == 'Wall 2':
-        if "keyboard" in Inventory.all and "charger" not in Inventory.all:
+        if "keyboard" in inventory and "charger" not in inventory:
             second_wall()
         else:
-            if "keyboard" in Inventory.all and "charger" in Inventory.all:
+            if "keyboard" in inventory and "charger" in inventory:
                 cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
                 option_two()
     elif chosen_wall == 'Wall 3':
-        if "keyboard" in Inventory.all and "charger" in Inventory.all:
+        if "keyboard" in inventory and "charger" in inventory:
             third_wall()
         else:
-            if "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+            if "keyboard" in inventory and "charger" in inventory and "key" in inventory:
                 cprint("You have already completed this wall. Time to leave!!", 'green', attrs=["bold"])
                 option_three()
     elif chosen_wall == 'Ask the guard to let you out.':
         cprint("Get out yourself!", 'red', attrs=["bold"])
     elif chosen_wall == 'Wall 3':
-        if "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+        if "keyboard" in inventory and "charger" in inventory and "key" in inventory:
             game_win()
 
     
 def first_wall_complete():
     cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
     option_two()
-
 
 
 def first_wall():
@@ -290,36 +327,38 @@ def wall_one_invent():
  
  
 def keyboard_clue():
-        cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'white', attrs=["bold"])
- 
+    Inventory.fetch_table()
+    cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'white', attrs=["bold"])
+
         # Create a list of item choices with IDs from Inventory.all
-        item_choices = [(tool.name, tool.id) for tool in Inventory.all]
+    inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
+    print(inventory)
  
-        inventory_choices = [
-            inquirer.List('item',
-                        message="Select an item to replace",
-                        choices=[item[0] for item in item_choices]
-            )
-        ]
-        item_answers = inquirer.prompt(inventory_choices)
+    inventory_choices = [
+        inquirer.List('item',
+                    message="Select an item to replace",
+                    choices= set([item.name for item in inventory])
+        )
+    ]
+    item_answers = inquirer.prompt(inventory_choices)
  
         # Get the selected item's name
-        selected_item_name = item_answers['item']
+    selected_item_name = item_answers['item']
  
         # Find the item by name
-        items = [tool for tool in Inventory.all if tool.name == selected_item_name]
+    items = [tool for tool in inventory if tool.name == selected_item_name]
  
-        if items:
+    if items:
             # Use itertools.islice to get the item after the found item
-            item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
+        item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
  
-            if item_after:
-                item_after.update_invent("keyboard")  # Set the name to "keyboard"
-                cprint(f"You have replaced {selected_item_name} with the keyboard!", 'green', attrs=["bold"])
-                cprint(f"maybe you can use this somewhere..", 'white', attrs=["bold"])
-                option_two()
-            else:
-                cprint("No item found after the selected item.", 'red', attrs=["bold"])
+        if item_after:
+            item_after.update_invent("keyboard")  # Set the name to "keyboard"
+            cprint(f"You have replaced {selected_item_name} with the keyboard!", 'green', attrs=["bold"])
+            cprint(f"maybe you can use this somewhere..", 'white', attrs=["bold"])
+            option_two()
+        else:
+            cprint("No item found after the selected item.", 'red', attrs=["bold"])
 
 def second_wall():
     cprint("Your group enters another room, this hallway, longer than before, but with only one door", 'white', attrs=["bold"])
