@@ -141,11 +141,94 @@ def option_one():
     if chosen_wall == 'Wall 1':
         first_wall()
     elif chosen_wall == 'Wall 2':
-        # Implement logic for Wall 2 here
-        pass
+        if "keyboard" in Inventory.all:
+            second_wall()
+        else:
+            cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
+            option_one()
     elif chosen_wall == 'Wall 3':
-        # Implement logic for Wall 3 here
-        pass
+        if "charger" in Inventory.all:
+            third_wall()
+        else:
+            cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
+            option_one()
+            
+            
+def option_two():
+    cprint("Looking around again, you see the walls before you.", attrs=["bold"])
+    time.sleep(3.5)
+
+    wall_choices = [
+        inquirer.List('wall',
+                      message="Which wall will it be?",
+                      choices=['Wall 1', 'Wall 2', 'Wall 3', 'Ask the guard to let you out.'])
+    ]
+    answers = inquirer.prompt(wall_choices)
+    chosen_wall = answers['wall']
+    
+    if chosen_wall == 'Wall 1':
+        first_wall_complete()
+    elif chosen_wall == 'Wall 2':
+        if "keyboard" in Inventory.all and "charger" in Inventory.all:
+            cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
+            option_two()
+        else:
+            second_wall()
+    elif chosen_wall == 'Wall 3':
+        if "charger" not in Inventory.all:
+            cprint("Looks like this wall needs some sort of tool to be accessed..", 'red', attrs=["bold"])
+            option_two()
+        elif "keyboard" in Inventory.all and "charger" in Inventory.all and "key" not in Inventory.all:
+            third_wall()
+        elif "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+            cprint("You have already completed this wall. Time to leave!!", 'green', attrs=["bold"])
+            option_three()
+    elif chosen_wall == 'Ask the guard to let you out.':
+        cprint("Not a chance!", 'red', attrs=["bold"])
+        option_two()
+
+        
+            
+    
+def option_three():
+    cprint("Looking around again, you see the walls before you.", attrs=["bold"])
+    time.sleep(3.5)
+
+    wall_choices = [
+        inquirer.List('wall',
+                      message="Which wall will it be?",
+                      choices=['Wall 1', 'Wall 2', 'Wall 3', 'Ask the guard to let you out.', 'Open the cell with the key'])
+    ]
+
+    answers = inquirer.prompt(wall_choices)
+    chosen_wall = answers['wall']
+
+    if chosen_wall == 'Wall 1':
+        first_wall_complete()
+    elif chosen_wall == 'Wall 2':
+        if "keyboard" in Inventory.all and "charger" not in Inventory.all:
+            second_wall()
+        else:
+            if "keyboard" in Inventory.all and "charger" in Inventory.all:
+                cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
+                option_two()
+    elif chosen_wall == 'Wall 3':
+        if "keyboard" in Inventory.all and "charger" in Inventory.all:
+            third_wall()
+        else:
+            if "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+                cprint("You have already completed this wall. Time to leave!!", 'green', attrs=["bold"])
+                option_three()
+    elif chosen_wall == 'Ask the guard to let you out.':
+        cprint("Get out yourself!", 'red', attrs=["bold"])
+    elif chosen_wall == 'Wall 3':
+        if "keyboard" in Inventory.all and "charger" in Inventory.all and "key" in Inventory.all:
+            game_win()
+
+    
+def first_wall_complete():
+    cprint("You have already completed this wall. Try a different one!", 'white', attrs=["bold"])
+    option_two()
 
 
 
@@ -172,59 +255,77 @@ def first_wall():
     ]
     answers = inquirer.prompt(questions)
     choice = answers['choice']
-
     if choice == "B":
-        cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-        cprint("                _______________________________________________",)
-        cprint("            _-'    .-.-____________________________________.-.-- `-_ ",)
-        cprint("          _-'.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-..--\  .-.-.`-_",)
-        cprint("       _-'.-.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.`__\. .-.-.-.`-_",)
-        cprint("    _-'.-.-.-.-. .-----.-.-.-.-.-[______]-.-.-.-.-.-.-.----. .-.-.-.-.`-_",)
-        cprint(" _-'.-.-.-.-.-. .|_________________________________________|. .---.-.-.-.`-_",)
-        cprint(":-----------------------------------------------------------------------------:",)
-        cprint("`---._.-----------------------------------------------------------------._.---'",)
-        wall_one_invent()
-        first_wall()
 
+        wall_one_invent()
+    else:
+        cprint("WRONG! Try again", "on_red", attrs=['bold'])
+ 
 def wall_one_invent():
+    cprint("CORRECT!", "white", "on_green", attrs=['bold'])
+    cprint("                _______________________________________________",)
+    cprint("            _-'    .-.-____________________________________.-.-- `-_ ",)
+    cprint("          _-'.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-..--\  .-.-.`-_",)
+    cprint("       _-'.-.-.-. /---.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.`__\. .-.-.-.`-_",)
+    cprint("    _-'.-.-.-.-. .-----.-.-.-.-.-[______]-.-.-.-.-.-.-.----. .-.-.-.-.`-_",)
+    cprint(" _-'.-.-.-.-.-. .|_________________________________________|. .---.-.-.-.`-_",)
+    cprint(":-----------------------------------------------------------------------------:",)
+    cprint("`---._.-----------------------------------------------------------------._.---'",)
+    cprint("                                                                                 ")
     cprint("A secret hatch opens on the wall and reveals a keyboard! Do you take it?", 'white', attrs=["bold"])
     questions = [
         inquirer.List('choice',
-                      message="Choose an option:",
+                      message="Choose an option",
                       choices=['Yes', 'No'],
                       default='Yes')
     ]
     answers = inquirer.prompt(questions)
     choice = answers['choice']
-    
+ 
     if choice == "Yes":
+        keyboard_clue()
+    elif choice == 'No':
+        cprint("Hint: riddles you solve give you tools along the way to help you escape", 'red', attrs=["bold"])
+ 
+ 
+ 
+def keyboard_clue():
         cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'white', attrs=["bold"])
+ 
+        # Create a list of item choices with IDs from Inventory.all
+        item_choices = [(tool.name, tool.id) for tool in Inventory.all]
+ 
+        inventory_choices = [
+            inquirer.List('item',
+                        message="Select an item to replace",
+                        choices=[item[0] for item in item_choices]
+            )
+        ]
+        item_answers = inquirer.prompt(inventory_choices)
+ 
+        # Get the selected item's name
+        selected_item_name = item_answers['item']
+ 
+        # Find the item by name
+        items = [tool for tool in Inventory.all if tool.name == selected_item_name]
+ 
+        if items:
+            # Use itertools.islice to get the item after the found item
+            item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
+ 
+            if item_after:
+                item_after.update_invent("keyboard")  # Set the name to "keyboard"
+                cprint(f"You have replaced {selected_item_name} with the keyboard!", 'green', attrs=["bold"])
+                cprint(f"maybe you can use this somewhere..", 'white', attrs=["bold"])
+                option_two()
+            else:
+                cprint("No item found after the selected item.", 'red', attrs=["bold"])
 
-    # Create a list of item choices with IDs from Inventory.all
-    item_choices = [(tool.name, tool.id) for tool in Inventory.all]
+def second_wall():
+    pass
 
-    inventory_choices = [
-        inquirer.List('item',
-                      message="Select an item to replace:",
-                      choices=[item[0] for item in item_choices]
-        )
-    ]
-    item_answers = inquirer.prompt(inventory_choices)
+def third_wall():
+    pass
 
-    # Get the selected item's name
-    selected_item_name = item_answers['item']
-
-    # Find the item by name
-    items = [tool for tool in Inventory.all if tool.name == selected_item_name]
-    
-    if items:
-        # Use itertools.islice to get the item after the found item
-        item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
-
-        if item_after:
-            item_after.update_invent("keyboard")  # Set the name to "keyboard"
-            cprint(f"You have replaced {selected_item_name} with the keyboard.", 'green', attrs=["bold"])
-        else:
-            cprint("No item found after the selected item.", 'red', attrs=["bold"])
-    else:
-        cprint("Item not found in inventory.", 'red', attrs=["bold"])
+def game_win():
+    pass
