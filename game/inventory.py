@@ -71,7 +71,6 @@ class Inventory:
         self.id = CURSOR.lastrowid-1
         type(self).all.append(self)
     
-    
     def update(self):
         sql = """
             UPDATE inventory
@@ -168,4 +167,6 @@ class Inventory:
         row = CURSOR.execute(sql, (item_id,)).fetchone()
         return cls.in_db(row) if row else None
     
+
+
 
