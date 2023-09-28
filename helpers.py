@@ -344,7 +344,7 @@ def keyboard_clue():
 
 def second_wall():
     cprint("Your group enters a long hallway, you see a one way mirror with a Horse. Why ? Who knows.", 'white', attrs=["bold"])
-    cprint("The horse tells you can free him, but stay in jail, or break into Room C, and gain an item to help you, but there are no hard feelings. ", 'white', attrs=["bold"])
+    cprint("The horse says you can free him, but stay in jail, or break into Room C, and gain an item to help you, but there are no hard feelings. ", 'white', attrs=["bold"])
     cprint("Which room do you break into? ", 'white', attrs=["bold"])
     cprint("And do you still feel guilt free ?", 'white', attrs=["bold"])
     cprint("              ___________________________________________", 'white')
@@ -386,10 +386,9 @@ def second_wall():
 
 
 def third_wall():
-    cprint("You use the charger the power up the screen on this wall. The screen lights up and displays a message..", 'white', attrs=["bold"])
+    cprint("You use the charger to power up the screen on this wall. The screen lights up and displays a message...", 'white', attrs=["bold"])
     cprint("Another interesting riddle description...", 'white', attrs=["bold"])    
     ascii_art = r'''
-
                  _______________________________________________________
                 |                                                       |
                 |                                                       |
@@ -413,8 +412,10 @@ def third_wall():
                 
     cprint(ascii_art, 'white')
     
+    max_attempts = 3  # Maximum number of allowed attempts
+    attempts = 0  # Initialize the attempts counter
 
-    while True:
+    while attempts < max_attempts:
         questions = [
             inquirer.Text('answer', message="Enter the secret phrase:")
         ]
@@ -431,7 +432,15 @@ def third_wall():
             key_clue()
             break
         else:
-            cprint("Wrong answer. Try again.", 'red')
+            attempts += 1
+            remaining_attempts = max_attempts - attempts
+            cprint(f"Wrong answer. You have {remaining_attempts} {'attempts' if remaining_attempts > 1 else 'attempt'} left.", 'red')
+            
+
+    if attempts >= max_attempts:
+        cprint("Game over! You've run out of attempts.", 'red', attrs=["bold"])
+        figlet = Figlet(font='ogre', width=100)
+        cprint(figlet.renderText('Game Over!'), 'red', attrs=["bold"])
             
 def key_art():
     ascii_art = r'''
