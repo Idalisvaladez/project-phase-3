@@ -73,7 +73,7 @@ class Player:
         CURSOR.execute(sql, (self.name,))
         CONN.commit()
 
-        self.id = CURSOR.lastrowid
+        self.id = CURSOR.lastrowid+1
         type(self).all.append(self)
         
 
