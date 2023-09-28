@@ -7,8 +7,6 @@ class Inventory:
         self.name = name
         self.id = id
         self.player_id = player_id
-        self.tools = []
-        Inventory.all.append(self)
 
     def __repr__(self):
         return f'{self.name}'
@@ -38,8 +36,10 @@ class Inventory:
     def fetch_table(cls):
         SQLfetch = CURSOR.execute("SELECT * FROM inventory").fetchall()
         for tool in SQLfetch:
-            cls.create_nonDB(tool[1],tool[0]-1, tool[2])
+            print(tool)
+            cls.create_nonDB(tool[1],tool[0]-1, tool[2]-1)
         CONN.commit()
+        print(cls.all)
         
     @classmethod
     def create_nonDB(cls, name, id, player_id):
@@ -65,11 +65,11 @@ class Inventory:
             VALUES (?, ?)
         """
 
-        CURSOR.execute(sql, (self.name, self.player_id))
+        CURSOR.execute(sql, (self.name, self.player_id+1))
         CONN.commit()
 
         self.id = CURSOR.lastrowid-1
-        type(self).all[self.id] = self
+        type(self).all.append(self)
     
     
     def update(self):
@@ -88,8 +88,10 @@ class Inventory:
             SET name = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (replacement_name, self.id))
+        CURSOR.execute(sql, (replacement_name, self.id + 1))
         CONN.commit()
+        type(self).create_nonDB(replacement_name,self.id,self.player_id)
+        type(self).all.pop(type(self).all.index(self))
 
     @classmethod
     def delete(cls, inventory):
@@ -102,7 +104,17 @@ class Inventory:
 
         cls.all.pop(cls.all.index(inventory))
 
+    @classmethod
+    def delete_by_player(cls, player_id):
+        sql = """
+            DELETE FROM inventory
+            WHERE player_id = ?
+        """
+        CURSOR.execute(sql, (player_id,))
+        CONN.commit()
 
+        for tool in [tool for tool in cls.all if tool.player_id == player_id]:
+            cls.all.pop(cls.all.index(tool))
 
     @classmethod
     def create(cls, name, player_id):

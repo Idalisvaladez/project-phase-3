@@ -14,6 +14,8 @@ from helpers import (
 )
 
 def main():
+    Player.drop_table()
+    Inventory.drop_table()
     welcome()
     print("New player?")
     questions = [

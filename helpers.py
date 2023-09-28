@@ -21,6 +21,7 @@ def create_player():
     Player.create_table()
     Inventory.create_table()
     Player.fetch_table()
+    Inventory.fetch_table()
     if len(Player.all) == 4:
         cprint("Already at max players, please select a prior one to replace", "red")
         questions = [
@@ -35,6 +36,7 @@ def create_player():
         for play in Player.all:
             if play.name == choice:
                 playerHold = play
+        Inventory.delete_by_player(playerHold.id)
         Player.remove_player(playerHold)
     
     try:
@@ -42,10 +44,7 @@ def create_player():
         player = Player.create(name)
         global current_player
         current_player = player.id
-        print(current_player)
         cprint(f"Player '{player}' successfully created.", 'green', attrs=['bold'])
-        # Fetch the existing items associated with the previous player (if any)
-        existing_items = Inventory.fetch_table()
         
         Inventory.create("Bobby pin", player.id),
         Inventory.create("UN-sharpened pencil", player.id),
@@ -62,6 +61,7 @@ def create_player():
 # Logic for if new player answer is No, that way they can choose an existing player out of
 # the list of records in our Player table
 def find_existing_player():
+    Player.create_table()
     Player.fetch_table()
     player_choices = [
         inquirer.List('player',
@@ -78,7 +78,6 @@ def find_existing_player():
         cprint("Error selecting player", "red")
     global current_player 
     current_player = player.id
-    print(current_player)
     start()
 
 def start():
@@ -101,7 +100,6 @@ def start():
 
 
 def storyline():
-    print(current_player)
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "light_cyan", attrs=["bold"])
     time.sleep(3.0)
     cprint("           ________________                        ________________________________________________", 'light_cyan')
@@ -128,7 +126,6 @@ def storyline():
 
 
 def options_choice():
-    print(current_player)
     time.sleep(3.0)
     cprint("As you take a moment to collect yourself you come up with three possible options", attrs=["bold"])
     cprint("You can either: ", attrs=["bold"])
@@ -155,8 +152,6 @@ def options_choice():
         print("Not an answer choice")
 
 def option_one():
-    print(current_player)
-    Inventory.fetch_table()
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("You get up to get a better look at your surroundings. You notice each wall has a different riddle.", attrs=["bold"])
     cprint("Standing in the middle your eyes dart back and forth to each wall.", attrs=["bold"])
@@ -189,7 +184,6 @@ def option_one():
             
             
 def option_two():
-    Inventory.fetch_table()
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("Looking around again, you see the walls before you.", attrs=["bold"])
     time.sleep(3.5)
@@ -227,7 +221,6 @@ def option_two():
             
     
 def option_three():
-    Inventory.fetch_table()
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
     cprint("Looking around again, you see the walls before you.", attrs=["bold"])
     time.sleep(3.5)
@@ -327,12 +320,10 @@ def wall_one_invent():
  
  
 def keyboard_clue():
-    Inventory.fetch_table()
     cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'white', attrs=["bold"])
 
         # Create a list of item choices with IDs from Inventory.all
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
-    print(inventory)
  
     inventory_choices = [
         inquirer.List('item',
@@ -346,19 +337,11 @@ def keyboard_clue():
     selected_item_name = item_answers['item']
  
         # Find the item by name
-    items = [tool for tool in inventory if tool.name == selected_item_name]
- 
-    if items:
-            # Use itertools.islice to get the item after the found item
-        item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
- 
-        if item_after:
-            item_after.update_invent("keyboard")  # Set the name to "keyboard"
-            cprint(f"You have replaced {selected_item_name} with the keyboard!", 'green', attrs=["bold"])
-            cprint(f"maybe you can use this somewhere..", 'white', attrs=["bold"])
-            option_two()
-        else:
-            cprint("No item found after the selected item.", 'red', attrs=["bold"])
+    items = [tool for tool in inventory if tool.name == selected_item_name and tool.player_id == current_player]
+    items[0].update_invent("Keyboard")  # Set the name to "keyboard"
+    cprint(f"You have replaced {selected_item_name} with the keyboard!", 'green', attrs=["bold"])
+    cprint(f"maybe you can use this somewhere..", 'white', attrs=["bold"])
+    option_two()
 
 def second_wall():
     cprint("Your group enters a long hallway, you see a one way mirror with a Horse. Why ? Who knows.", 'white', attrs=["bold"])
