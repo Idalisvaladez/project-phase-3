@@ -81,7 +81,7 @@ def find_existing_player():
     start()
 
 def start():
-    print(f"Ready? {current_player}")
+    print(f"Ready Player {current_player}?")
     questions = [
         inquirer.List('choice',
                       message="Choose an option:",
@@ -128,12 +128,11 @@ def storyline():
 def options_choice():
     time.sleep(3.0)
     cprint("As you take a moment to collect yourself you come up with three possible options", attrs=["bold"])
-    cprint("You can either: ", attrs=["bold"])
     time.sleep(2.0)
 
     options = [
         inquirer.List('option',
-                      message="What will it be?",
+                      message="You can either",
                       choices=['Take a look around your jail cell', 'Check your pockets for any tools that could help you escape', 'Scream, cry, and beg for forgiveness'])
     ]
 
@@ -143,11 +142,10 @@ def options_choice():
     if chosen_option == 'Take a look around your jail cell':
         option_one()
     elif chosen_option == 'Check your pockets for any tools that could help you escape':
-        # Implement logic for this option here
-        pass
+        tools_storyline()
+        utilize_tools()
     elif chosen_option == 'Scream, cry, and beg for forgiveness':
-        # Implement logic for this option here
-        pass
+        beg()
     else:
         print("Not an answer choice")
 
@@ -185,6 +183,7 @@ def option_one():
             
 def option_two():
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
+    print(inventory)
     cprint("Looking around again, you see the walls before you.", attrs=["bold"])
     time.sleep(3.5)
 
@@ -474,6 +473,101 @@ def key_clue():
 def game_win():
     pass
 
+
+
+def tools_storyline():
+    cprint("You eagerly reach into your pockets to see what you can find")
+    cprint("Looking at your hands you notice 4 small items")
+    cprint("A Bobby pin, some Loose change, an UN-sharpened pencil, and a Chewed-up bubble gum.")
+    cprint("You start thinking... 'maybe there's some way I can utilize one of these tools to escape...'")
+
+def utilize_tools():
+    questions = [
+        inquirer.List('choice',
+                      message="Wan't to try using one of these tools?",
+                      choices=['Yes', 'No'],
+                    ),
+    ]
+    
+    answers = inquirer.prompt(questions)
+    choice = answers['choice'].lower()
+
+    if choice == "yes":
+        tools_choice()
+    elif choice == "no":
+        cprint("You think to yourself there's no way any of these items can help me right now")
+        cprint("Time to go back to my other options...")
+        options_choice()
+
+
+def tools_choice():
+    questions = [
+            inquirer.List('choice',
+                      message="How are you breaking out of here?",
+                      choices=['Pick the jail cell lock with your bobby pin', 'Bribe the guards with your loose change', 'Use the UN-sharpened pencil to reach for the keys off the guards waist ', 'Use the gums stickiness to spider-man your way out'],
+            ),
+        ]
+    
+    answers = inquirer.prompt(questions)
+    selection = answers['choice']
+    if selection == 'Pick the jail cell lock with your bobby pin':
+            cprint("You were Unsuccessful! Looks like you just wasted time! Go back to starting options")
+            options_choice()
+    elif selection == 'Bribe the guards with your loose change':
+            cprint("HAHA HAHA! The guards all laughed in your face. Go back to starting options")
+            options_choice()
+    elif selection == 'Use the UN-sharpened pencil to reach for the keys off the guards waist ':
+            cprint("Oh no! The UN-sharpened pencil wasn't long enough to reach! Go back to starting options")
+            options_choice()
+    elif selection == 'Use the gums stickiness to spider-man your way out':
+            cprint("OUCH! The stickiness wore off and you fell face first! Go back to starting options")
+            options_choice()
+    else:
+        print("Error")
+
+def beg():
+    ascii_beg = r'''
+       _.-._
+     /| | | |_
+     || | | | |
+     || | | | |
+    _||     ` |
+   \\`\       ;
+    \\        |
+     \\      /
+     | |    |
+     | |    |
+    '''
+    cprint(ascii_beg, 'white')
+    time.sleep(2.0)
+    ascii_phone = r'''
+               
+                   # # # # # # # # # 
+                #                     #
+                #                        #
+                #                          #
+                #        =====     =====    #
+                #         | |      | |      #
+                #         | |      | |      #
+                #              ~           #                    ___________
+                #                         #                    ||          ||
+              #                        #                       ||          ||
+            #                 #   #                           _||          ||  _
+            #      ##        (                               (_||          || ( |
+            #   #   #---------#                              (_||          || / /
+            #     #   #__#  # #                              (_||          ||   )
+            #      ##__|   #    #                              ||          ||  (
+            #           )   #    #                            (|_____--_____|   \
+            #           #   #    #                                      \        \
+            #         #    #    #                                        \        \
+            #_______# #____#___#
+                                    
+    '''
+    cprint(ascii_phone, 'white')
+    cprint("The guards stream recorded you and now you're going viral on all social media platforms.")
+    cprint("Even if you escape your reputation will forever be tainted.")
+    cprint("Choose another option")
+    options_choice()
 
 #def second_wall():
     #logic built to have limited attempts on correct answer
