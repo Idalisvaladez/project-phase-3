@@ -355,17 +355,17 @@ def second_wall():
     cprint("              |      |_____/ \_____|____________________|", 'white')
     cprint("              |      |             |                    |", 'white')
     cprint("              |      |             |                    |", 'white')
-    cprint("              |      | _____/ \____|                    |", 'white')
-    cprint("              |      |      B      |                    |", 'white')
-    cprint("              |       _____________|____________________|", 'white')
-    cprint("              |      |                                  |",'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("              |      |      B      |  *free the horsey* |", 'white')
+    cprint("              |       _____________|____________________|  ", 'white')
+    cprint("              |      |                                  | ",'white')
     cprint("              |      |< What Is The Meaning Of Life...?>|", 'white')
-    cprint("              |      |     ---------------              |", 'white')
+    cprint("              |      |     ---------------              | ", 'white')
     cprint("              |     /| \   ^__^                         |", 'white')
     cprint("              |     ||  \  (oo)\__________......        |", 'white')
     cprint("              |     \|     (__)\       )\/)             |", 'white')
     cprint("              |      |          ||      ||              |", 'white')
-    cprint("______________|______|__________||______||______________|", 'white')
+    cprint("______________|______|__________||______||______________|   ", 'white')
      
     questions = [
         inquirer.List('choice',
@@ -377,12 +377,53 @@ def second_wall():
     answers = inquirer.prompt(questions)
     choice = answers['choice']
 
-    if choice == "D" :
+    if choice == "C" :
         cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-        # Add any additional logic for a correct answer in the second wall
-        second_wall()
+        charger_clue()
+        
     else:
         cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
+        second_wall()
+def charger_clue():
+    cprint("You find a charger! Now, let's choose an item to replace:", 'white', attrs=["bold"])
+
+    
+    item_choices = [(tool.name, tool.id) for tool in Inventory.all]
+
+    inventory_choices = [
+        inquirer.List('item',
+                      message="Select an item to replace",
+                      choices=[item[0] for item in item_choices]
+        )
+    ]
+    item_answers = inquirer.prompt(inventory_choices)
+
+    
+    selected_item_name = item_answers['item']
+
+    
+    items = [tool for tool in Inventory.all if tool.name == selected_item_name]
+
+    if items:
+        
+        item_after = next(itertools.islice(Inventory.all, Inventory.all.index(items[0]) + 1, None), None)
+
+        if item_after:
+            item_after.update_invent("charger")  
+            cprint(f"You have replaced {selected_item_name} with the charger!", 'green', attrs=["bold"])
+            cprint(f"Maybe you can use this somewhere..", 'white', attrs=["bold"])
+            option_two()
+        else:
+            cprint("No item found after the selected item.", 'red', attrs=["bold"])
+
+def second_wall_completed():
+    cprint("You have successfully completed the second wall!", 'green', attrs=["bold"])
+    option_two()  
+
+def game_win():
+    pass
+
+
 
 
 def third_wall():
@@ -568,35 +609,3 @@ def beg():
     cprint("Even if you escape your reputation will forever be tainted.")
     cprint("Choose another option")
     options_choice()
-
-#def second_wall():
-    #logic built to have limited attempts on correct answer
-
-    # Get the player's answer to the riddle
-    #correct_answer = "d"  # Assuming the correct answer is "D"
-    #max_attempts = 3
-    #attempts = 0
-
-    #while attempts < max_attempts:
-        #questions = [
-            #inquirer.Text('choice',
-                           #message="Choose an option (A, B, C, D):",
-                           #validate=lambda _, x: x.lower() in ['a', 'b', 'c', 'd'],
-                           #,
-        #]
-
-        #answers = inquirer.prompt(questions)
-        #choice = answers['choice'].strip().lower()
-
-        #if choice == correct_answer:
-            #cprint("CORRECT!", "white", "on_green", attrs=['bold'])
-            # Add any additional logic for a correct answer in the second wall
-            #break  # Exit the loop if the answer is correct
-        #else:
-            #attempts += 1
-            #remaining_attempts = max_attempts - attempts
-            #cprint(f"TRY AGAIN! {remaining_attempts} attempts remaining.", 'white', 'on_red', attrs=["bold"])
-
-    #else:
-        #cprint("Sorry, you've run out of attempts. Game over!", 'red', attrs=["bold"])
-        # might want to handle the game over scenario here
