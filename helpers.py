@@ -322,10 +322,83 @@ def keyboard_clue():
                 cprint("No item found after the selected item.", 'red', attrs=["bold"])
 
 def second_wall():
-    pass
+    cprint("Your group enters another room, this hallway, longer than before, but with only one door", 'white', attrs=["bold"])
+    cprint("You pass the door and at the end of the hall, you see a one way mirror with a Horse. Why ? Who knows. You should turn around", 'white', attrs=["bold"])
+    # Modify the riddle and wall layout 
+    cprint("Another interesting riddle description...", 'white', attrs=["bold"])
+    cprint("              ___________________________________________", 'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("       --->       A  |      D                           |", 'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("              |      |__________   |___________________ |", 'white')
+    cprint("              |      |      C      |                    |", 'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("              |      | _____/ \____|                    |", 'white')
+    cprint("              |      |      B      |                    |", 'white')
+    cprint("              |       _____________|____________________|  ", 'white')
+    cprint("              |      |                                  | ",'white')
+    cprint("              |      |< What Is The Meaning Of Life...?>|", 'white')
+    cprint("              |      |     ---------------              | ", 'white')
+    cprint("              |     /| \   ^__^                         |", 'white')
+    cprint("              |     ||  \  (oo)\__________......        |", 'white')
+    cprint("              |     \|     (__)\       )\/)             |", 'white')
+    cprint("              |      |          ||      ||              |", 'white')
+    cprint("______________|______|__________||______||______________|   ", 'white')
+     
+    questions = [
+        inquirer.List('choice',
+                      message="Choose an option:",
+                      choices=['A', 'B', 'C', 'D',],
+                      default='A')
+    ]
+    
+    answers = inquirer.prompt(questions)
+    choice = answers['choice']
+
+    if choice == "D" :
+        cprint("CORRECT!", "white", "on_green", attrs=['bold'])
+        # Add any additional logic for a correct answer in the second wall
+    else:
+        cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
+        second_wall()
+
 
 def third_wall():
     pass
 
 def game_win():
     pass
+
+
+#def second_wall():
+    #logic built to have limited attempts on correct answer
+
+    # Get the player's answer to the riddle
+    #correct_answer = "d"  # Assuming the correct answer is "D"
+    #max_attempts = 3
+    #attempts = 0
+
+    #while attempts < max_attempts:
+        #questions = [
+            #inquirer.Text('choice',
+                           #message="Choose an option (A, B, C, D):",
+                           #validate=lambda _, x: x.lower() in ['a', 'b', 'c', 'd'],
+                           #,
+        #]
+
+        #answers = inquirer.prompt(questions)
+        #choice = answers['choice'].strip().lower()
+
+        #if choice == correct_answer:
+            #cprint("CORRECT!", "white", "on_green", attrs=['bold'])
+            # Add any additional logic for a correct answer in the second wall
+            #break  # Exit the loop if the answer is correct
+        #else:
+            #attempts += 1
+            #remaining_attempts = max_attempts - attempts
+            #cprint(f"TRY AGAIN! {remaining_attempts} attempts remaining.", 'white', 'on_red', attrs=["bold"])
+
+    #else:
+        #cprint("Sorry, you've run out of attempts. Game over!", 'red', attrs=["bold"])
+        # might want to handle the game over scenario here
