@@ -361,20 +361,20 @@ def keyboard_clue():
             cprint("No item found after the selected item.", 'red', attrs=["bold"])
 
 def second_wall():
-    cprint("Your group enters another room, this hallway, longer than before, but with only one door", 'white', attrs=["bold"])
-    cprint("You pass the door and at the end of the hall, you see a one way mirror with a Horse. Why ? Who knows. You should turn around", 'white', attrs=["bold"])
-    # Modify the riddle and wall layout 
-    cprint("Another interesting riddle description...", 'white', attrs=["bold"])
+    cprint("Your group enters a long hallway, you see a one way mirror with a Horse. Why ? Who knows.", 'white', attrs=["bold"])
+    cprint("The horse tells you can free him, but stay in jail, or break into Room C, and gain an item to help you, but there are no hard feelings. ", 'white', attrs=["bold"])
+    cprint("Which room do you break into? ", 'white', attrs=["bold"])
+    cprint("And do you still feel guilt free ?", 'white', attrs=["bold"])
     cprint("              ___________________________________________", 'white')
     cprint("              |      |             |                    |", 'white')
     cprint("              |      |             |                    |", 'white')
-    cprint("       --->       A  |      D                           |", 'white')
+    cprint("       --->       A  |      C      |       *item*       |", 'white')
     cprint("              |      |             |                    |", 'white')
-    cprint("              |      |__________   |___________________ |", 'white')
-    cprint("              |      |      C      |                    |", 'white')
+    cprint("              |      |_____/ \_____|____________________|", 'white')
     cprint("              |      |             |                    |", 'white')
-    cprint("              |      | _____/ \____|                    |", 'white')
-    cprint("              |      |      B      |                    |", 'white')
+    cprint("              |      |             |                    |", 'white')
+    cprint("              |      |_____/ \_____|                    |", 'white')
+    cprint("              |      |      B      |  *free the horsey* |", 'white')
     cprint("              |       _____________|____________________|  ", 'white')
     cprint("              |      |                                  | ",'white')
     cprint("              |      |< What Is The Meaning Of Life...?>|", 'white')
@@ -388,7 +388,7 @@ def second_wall():
     questions = [
         inquirer.List('choice',
                       message="Choose an option:",
-                      choices=['A', 'B', 'C', 'D',],
+                      choices=['A', 'B', 'C'],
                       default='A')
     ]
     
@@ -398,9 +398,9 @@ def second_wall():
     if choice == "D" :
         cprint("CORRECT!", "white", "on_green", attrs=['bold'])
         # Add any additional logic for a correct answer in the second wall
+        second_wall()
     else:
         cprint("TRY AGAIN!", 'white', 'on_red', attrs=["bold"])
-        second_wall()
 
 
 def third_wall():
