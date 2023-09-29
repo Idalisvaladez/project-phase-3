@@ -12,6 +12,10 @@ winner = sa.WaveObject.from_wave_file("Sounds/Yay_-_Sound_Effect.wav")
 guard = sa.WaveObject.from_wave_file("Sounds/Cartoon_Mumble_Speak_-_Sound_Effect_HQ.wav")
 bgm = sa.WaveObject.from_wave_file("Sounds/BGM.wav")
 
+def winner_audio():
+    winner.play()
+    wav_object.play()
+
 
 current_player = 0
 
@@ -270,6 +274,7 @@ def option_three():
         cprint("Get out yourself!", 'red', attrs=["bold"])
         option_three()
     elif chosen_wall == 'Open the cell with the key':
+        winner_audio()
         if has_keyboard and has_charger and has_key:
             game_win()
 
@@ -367,7 +372,7 @@ def keyboard_clue():
     option_two()
 
 def second_wall():
-    cprint("You a long hallway, and see a one way mirror with a Horse. Why? Who knows.", 'white', 'on_blue', attrs=["bold"])
+    cprint("You go down a long hallway, and see a one way mirror with a Horse. Why? Who knows.", 'white', 'on_blue', attrs=["bold"])
     cprint("The horse says you can free him, but stay in jail. OR break into Room C, and gain an item to help you escape, no hard feelings... ", 'white','on_blue', attrs=["bold"])
     time.sleep(1.0)
     cprint("Which room do you break into? ", 'white', 'on_blue', attrs=["bold"])
@@ -477,8 +482,8 @@ def third_wall():
         third_wall()
     
 def cipher():
-    cprint("You use the charger to power up the screen on this wall. The screen lights up and displays a message...", 'blue', attrs=["bold"])
-    cprint("Another interesting riddle to decipher...", 'blue', attrs=["bold"])    
+    cprint("You use the charger to power up the screen and a slot opens up to connect your keyboard . The screen lights up and displays a message...", 'blue', attrs=["bold"])
+    cprint("Interesting.. Looks like another riddle for us to decipher...", 'blue', attrs=["bold"])    
     ascii_art = r'''
                  _______________________________________________________
                 |                                                       |
@@ -517,9 +522,9 @@ def cipher():
 
         if user_input == "the cake is a lie":
             cprint("You solved it!", 'green', attrs=["bold"])
-            cprint("The screen now shows an image resembling a key, and as you watch, it materializes before your eyes, gently descending into your open palm.", 'blue', attrs=["bold"])
+            cprint("The screen now shows an a key, and as you continue staring at it, the key begins materializing right before your eyes.", 'blue', attrs=["bold"])
             key_art()
-            cprint("This key looks like it fits the cell door..", 'blue')
+            cprint("Hmm... This key looks like it fits the door cell's lock..", 'blue')
             key_clue()
             break
         else:
@@ -547,7 +552,7 @@ def key_art():
     
             
 def key_clue():
-    cprint("You decide to take the key. :", 'blue', attrs=["bold"])
+    cprint("You decide to take the key.", 'blue', attrs=["bold"])
 
     # Create a list of item choices with IDs from Inventory.all
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
@@ -684,8 +689,13 @@ def beg():
     options_choice()
 
 def game_win():
-    winner.play()
-    wav_object.play()
+    try:
+        winner_audio()
+    except Exception as e:
+        print(f"Error playing audio: {str(e)}")
+    figlet = Figlet(font='larry3d', width= 100)
+    cprint(figlet.renderText('WINNER!'), 'green', attrs=['bold'])
+    cprint("Congrats!! You've managed to escape, now go utilize your hard earned tools as a new and imporoved Software Engineer.", "blue", attrs=['bold'])
     ascii_win = '''                                                                                                                                                                                                                                                                      
                      @=*=-:.                                                                                                                  
                      @ .--=+*:@@@@@@@@@@@#- :.                                                                                                
@@ -741,5 +751,3 @@ def game_win():
                                                            ....:........       ..::.::::..         .                                                                                                                                                                                                                                                                                         
     '''
     cprint(ascii_win, "white")
-    cprint("Congrats!! You've managed to escape, now go utilize some of your tools as a new and imporoved Software Engineer.")
-
