@@ -10,8 +10,8 @@ import simpleaudio as sa
 wav_object = sa.WaveObject.from_wave_file("Sounds/Prison_Cell_Door.wav")
 winner = sa.WaveObject.from_wave_file("Sounds/Yay_-_Sound_Effect.wav")
 guard = sa.WaveObject.from_wave_file("Sounds/Cartoon_Mumble_Speak_-_Sound_Effect_HQ.wav")
-BGM = sa.WaveObject.from_wave_file("Sounds/BGM.wav")
-# background_music = sa.WaveObject.from_wave_file("")
+bgm = sa.WaveObject.from_wave_file("Sounds/BGM.wav")
+
 
 current_player = 0
 
@@ -103,7 +103,6 @@ def start():
 
 def storyline():
     wav_object.play()
-    BGM.play()
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "white", "on_blue", attrs=["bold"])
     time.sleep(3.0)
     guard.play()
@@ -132,6 +131,7 @@ def storyline():
 
 
 def options_choice():
+    bgm.play()
     time.sleep(3.0)
     cprint("As you take a moment to collect yourself you come up with three possible options", "blue", attrs=["bold"])
     time.sleep(2.0)
@@ -234,6 +234,9 @@ def option_two():
     
 def option_three():
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
+    has_keyboard = any(tool.name == "keyboard" for tool in inventory)
+    has_charger = any(tool.name == "charger" for tool in inventory)
+    has_key = any(tool.name == 'key' for tool in inventory)
     cprint("Now that I have more tools, maybe there's a better option...","blue", attrs=["bold"])
     time.sleep(3.5)
 
@@ -246,27 +249,28 @@ def option_three():
     answers = inquirer.prompt(wall_choices)
     chosen_wall = answers['wall']
 
+
     if chosen_wall == 'Wall 1':
         first_wall_complete()
     elif chosen_wall == 'Wall 2':
-        if "keyboard" in inventory and "charger" not in inventory:
+        if has_keyboard and has_charger not in inventory:
             second_wall()
         else:
-            if "keyboard" in inventory and "charger" in inventory:
+            if has_keyboard and has_charger:
                 cprint("You have already completed this wall. Try a different one!", "red", attrs=["bold"])
                 option_two()
     elif chosen_wall == 'Wall 3':
-        if "keyboard" in inventory and "charger" in inventory:
+        if has_keyboard and has_charger:
             third_wall()
         else:
-            if "keyboard" in inventory and "charger" in inventory and "key" in inventory:
+            if has_keyboard and has_charger and has_key:
                 cprint("You have already completed this wall. Time to leave!!", 'green', attrs=["bold"])
                 option_three()
     elif chosen_wall == 'Ask the guard to let you out':
         cprint("Get out yourself!", 'red', attrs=["bold"])
         option_three()
     elif chosen_wall == 'Open the cell with the key':
-        if "keyboard" in inventory and "charger" in inventory and "key" in inventory:
+        if has_keyboard and has_charger and has_key:
             game_win()
 
     
@@ -339,7 +343,7 @@ def wall_one_invent():
  
  
 def keyboard_clue():
-    cprint("You decide to take the keyboard. Now, let's choose an item to replace:", 'blue', attrs=["bold"])
+    cprint("You decide to take the keyboard. Now, let's choose one of our starter tools to replace:", 'blue', attrs=["bold"])
 
         # Create a list of item choices with IDs from Inventory.all
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
@@ -363,8 +367,8 @@ def keyboard_clue():
     option_two()
 
 def second_wall():
-    cprint("Your group enters a long hallway, you see a one way mirror with a Horse. Why ? Who knows.", 'white', 'on_blue', attrs=["bold"])
-    cprint("The horse says you can free him, but stay in jail, or break into Room C, and gain an item to help you, but there are no hard feelings. ", 'white','on_blue', attrs=["bold"])
+    cprint("You a long hallway, and see a one way mirror with a Horse. Why? Who knows.", 'white', 'on_blue', attrs=["bold"])
+    cprint("The horse says you can free him, but stay in jail. OR break into Room C, and gain an item to help you escape, no hard feelings... ", 'white','on_blue', attrs=["bold"])
     time.sleep(1.0)
     cprint("Which room do you break into? ", 'white', 'on_blue', attrs=["bold"])
     time.sleep(2.0)
@@ -426,7 +430,7 @@ def charger_clue():
   ``--...___;;;;|==
     '''
     cprint(ascii_charger, )
-    cprint("You find a charger! Now, let's choose an item to replace:", 'blue', attrs=["bold"])
+    cprint("You find a charger! Now, let's choose one of our starter tools to replace:", 'blue', attrs=["bold"])
     item_choices = [tool for tool in Inventory.all if tool.player_id == current_player]
 
     inventory_choices = [
@@ -543,14 +547,14 @@ def key_art():
     
             
 def key_clue():
-    cprint("You decide to take the key. Now, let's choose an item to replace:", 'blue', attrs=["bold"])
+    cprint("You decide to take the key. :", 'blue', attrs=["bold"])
 
     # Create a list of item choices with IDs from Inventory.all
     inventory = [tool for tool in Inventory.all if tool.player_id == current_player]
 
     inventory_choices = [
         inquirer.List('item',
-                      message="Select an item to replace",
+                      message="Let's swap one of our starter tools for this",
                       choices=set([item.name for item in inventory])
                       )
     ]
@@ -676,10 +680,11 @@ def beg():
                                     
     '''
     cprint(ascii_phone, 'white')
-    cprint("Even if you escape your reputation will forever be tainted.", 'blue', attrs=['bold'])
+    cprint("Even if you escape your reputation will forever be tainted. Go back to starting options.", 'blue', attrs=['bold'])
     options_choice()
 
 def game_win():
+    winner.play()
     wav_object.play()
     ascii_win = '''                                                                                                                                                                                                                                                                      
                      @=*=-:.                                                                                                                  
@@ -736,5 +741,5 @@ def game_win():
                                                            ....:........       ..::.::::..         .                                                                                                                                                                                                                                                                                         
     '''
     cprint(ascii_win, "white")
-    winner.play()
+    cprint("Congrats!! You've managed to escape, now go utilize some of your tools as a new and imporoved Software Engineer.")
 
