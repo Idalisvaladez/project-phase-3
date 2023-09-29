@@ -36,10 +36,9 @@ class Inventory:
     def fetch_table(cls):
         SQLfetch = CURSOR.execute("SELECT * FROM inventory").fetchall()
         for tool in SQLfetch:
-            print(tool)
             cls.create_nonDB(tool[1],tool[0]-1, tool[2]-1)
         CONN.commit()
-        print(cls.all)
+        
         
     @classmethod
     def create_nonDB(cls, name, id, player_id):
