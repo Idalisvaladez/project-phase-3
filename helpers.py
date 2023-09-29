@@ -10,6 +10,7 @@ import simpleaudio as sa
 wav_object = sa.WaveObject.from_wave_file("Sounds/Prison_Cell_Door.wav")
 winner = sa.WaveObject.from_wave_file("Sounds/Yay_-_Sound_Effect.wav")
 guard = sa.WaveObject.from_wave_file("Sounds/Cartoon_Mumble_Speak_-_Sound_Effect_HQ.wav")
+BGM = sa.WaveObject.from_wave_file("Sounds/BGM.wav")
 # background_music = sa.WaveObject.from_wave_file("")
 
 current_player = 0
@@ -102,6 +103,7 @@ def start():
 
 def storyline():
     wav_object.play()
+    BGM.play()
     cprint("You wake up being tossed into a Jail Cell. When you ask the guards why? They say...", "white", "on_blue", attrs=["bold"])
     time.sleep(3.0)
     guard.play()
